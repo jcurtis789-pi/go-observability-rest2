@@ -1,4 +1,4 @@
-FROM golang:1.21 AS builder
+FROM docker.io/golang:1.21 AS builder
 
 WORKDIR /app
 
@@ -18,4 +18,4 @@ COPY --from=builder /app/server .
 
 EXPOSE 8080
 
-CMD["./server"]
+CMD ["./server"]
