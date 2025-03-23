@@ -43,7 +43,7 @@ func main() {
 		trace.WithBatcher(exporter),
 		trace.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("go-observability-rest1"),
+			semconv.ServiceNameKey.String("go-observability-rest2"),
 		)),
 	)
 	otel.SetTracerProvider(tp)
