@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -15,10 +18,18 @@ import (
 )
 
 var tracer = otel.Tracer("gor2")
+var (
+	opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "processed_requests",
+		Help: "The total number of requests processed",
+	})
+)
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	_, span := tracer.Start(context.Background(), "handle")
 	defer span.End()
+
+	opsProcessed.Inc()
 	fmt.Fprintf(w, "bar")
 }
 
@@ -50,6 +61,7 @@ func main() {
 
 	fmt.Println("Tracing enabled...")
 	http.HandleFunc("/", handler)
+	http.Handle("/metrics", promhttp.Handler())
 	fmt.Println("Starting server on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
